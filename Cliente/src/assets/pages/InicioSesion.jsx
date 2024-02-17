@@ -84,9 +84,22 @@ function InicioSesion() {
 
 export default InicioSesion;
 
+///////////////////////////////
+//          USUARIO 1        // 
+//                           //
+//                           //
+//221245@ids.upchiapas.edu.mx//
+//                           //
+//       Nanioelcacas13@     //
+///////////////////////////////
 
-//221245@ids.upchiapas.edu.mx
-//Nanioelcacas13@
 
-//manoloarduino13@hotmail.com
-//Manolo13"
+///////////////////////////////
+//         USUARIO 2         // 
+//                           //
+//                           //
+//manoloarduino13@hotmail.com//
+//                           //
+//         Manolo13"         //
+///////////////////////////////
+
