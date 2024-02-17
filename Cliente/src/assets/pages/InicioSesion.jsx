@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import "../style/InicioSesion.css";
 
 function InicioSesion() {
@@ -11,8 +12,19 @@ function InicioSesion() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        // Validaciones
+        if (!correo || !/\S+@\S+\.\S+/.test(correo)) {
+            Swal.fire('Error', 'El correo no es válido', 'error');
+            return;
+        }
+
+        if (!password || password.length < 8 || password.length > 15 || !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/.test(password)) {
+            Swal.fire('Error', 'La contraseña debe tener al menos una letra mayúscula, una letra minúscula, un dígito, no espacios en blanco, un carácter especial y debe ser de 8 a 15 caracteres de longitud', 'error');
+            return;
+        }
+
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', { // Cambia '/api/user' a '/api/auth/login'
+            const response = await fetch('http://localhost:8080/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -24,11 +36,15 @@ function InicioSesion() {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json();
+                Swal.fire('Error', errorData.msg, 'error');
+                return;
             }
 
             const data = await response.json();
             console.log(data);
+
+            Swal.fire('Éxito', 'Inicio de sesión exitoso', 'success');
 
             navigate('/tableSearch');
         } catch (error) {
@@ -71,3 +87,6 @@ export default InicioSesion;
 
 //221245@ids.upchiapas.edu.mx
 //Nanioelcacas13@
+
+//manoloarduino13@hotmail.com
+//Manolo13"

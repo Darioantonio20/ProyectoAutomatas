@@ -1,13 +1,30 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 function Registro() {
     const [nombre, setNombre] = useState('');
     const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        if (!nombre) {
+            Swal.fire('Error', 'El nombre de usuario es obligatorio', 'error');
+            return;
+        }
+
+        if (!correo || !/\S+@\S+\.\S+/.test(correo)) {
+            Swal.fire('Error', 'El correo no es válido', 'error');
+            return;
+        }
+
+        if (!password || password.length < 8 || password.length > 15 || !/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/.test(password)) {
+            Swal.fire('Error', 'La contraseña debe tener al menos una letra mayúscula, 1 letra minúscula, 1 dígito, no espacios en blanco, un carácter especial y debe ser de 8 a 15 caracteres de longitud', 'error');
+            return;
+        }
 
         const response = await fetch('http://localhost:8080/api/user', {
             method: 'POST',
@@ -15,14 +32,21 @@ function Registro() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                nombre,
-                correo,
-                password
+                nombre: nombre,
+                correo: correo,
+                password: password
             })
         });
 
-        const data = await response.json();
-        console.log(data);
+        if (!response.ok) {
+            const errors = await response.json();
+            Swal.fire('Error', errors.map(error => error.msg).join('\n'), 'error');
+        } else {
+            const data = await response.json();
+            console.log(data);
+            Swal.fire('Éxito', 'Registro completado', 'success');
+            navigate('/');
+        }
     }
 
     return ( 
