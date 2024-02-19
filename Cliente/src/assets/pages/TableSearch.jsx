@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "../style/TableSearch.css";
 
 export default function App() {
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [dfa, setDfa] = useState(null);
 
     const data = [
         { MATRICULA: 203452, NOMBRE_DEL_ALUMNO: 'Aguilar Pérez Héctor Uriel', TIPO_DE_BUSQUEDA: 'nombre' },
@@ -16,11 +17,11 @@ export default function App() {
         { MATRICULA: 203422, NOMBRE_DEL_ALUMNO: 'Gomez Vazquez Alan Manuel', TIPO_DE_BUSQUEDA: 'correo' },
         { MATRICULA: 221198, NOMBRE_DEL_ALUMNO: 'Guillen Luna Jesús Alejandro', TIPO_DE_BUSQUEDA: 'telefono contacto' },
         { MATRICULA: 221199, NOMBRE_DEL_ALUMNO: 'Gumeta Navarro Carlos Eduardo', TIPO_DE_BUSQUEDA: 'nombre' },
-        { MATRICULA: 221245, NOMBRE_DEL_ALUMNO: 'Gutiérrez Álvarez Darío Antonio', TIPO_DE_BUSQUEDA: 'correo' },
+        { MATRICULA: 221245, NOMBRE_DEL_ALUMNO: 'Gutiérrez Álvarez Darío Antonio', TIPO_DE_BUSQUEDA: 'antoniodario10@hotmail.com' },
         { MATRICULA: 221200, NOMBRE_DEL_ALUMNO: 'Gutiérrez Martínez Yahir Alexander', TIPO_DE_BUSQUEDA: 'telefono contacto' },
         { MATRICULA: 221201, NOMBRE_DEL_ALUMNO: 'Jimenez Escobar Nancy Guadalupe', TIPO_DE_BUSQUEDA: 'nombre' },
         { MATRICULA: 221202, NOMBRE_DEL_ALUMNO: 'Lievano Ovando Carlos Raúl', TIPO_DE_BUSQUEDA: 'correo' },
-        { MATRICULA: 221204, NOMBRE_DEL_ALUMNO: 'López Ruíz Joel De Jesús', TIPO_DE_BUSQUEDA: 'telefono contacto' },
+        { MATRICULA: 221204, NOMBRE_DEL_ALUMNO: 'López Ruíz Joel De Jesús', TIPO_DE_BUSQUEDA: '9661130883' },
         { MATRICULA: 211234, NOMBRE_DEL_ALUMNO: 'Martínez Castillejos César Josué', TIPO_DE_BUSQUEDA: 'nombre' },
         { MATRICULA: 213021, NOMBRE_DEL_ALUMNO: 'Martinez Montoya Luis Alejandro', TIPO_DE_BUSQUEDA: 'correo' },
         { MATRICULA: 203457, NOMBRE_DEL_ALUMNO: 'Morales León Rodrigo', TIPO_DE_BUSQUEDA: 'telefono contacto' },
@@ -35,47 +36,91 @@ export default function App() {
         { MATRICULA: 221224, NOMBRE_DEL_ALUMNO: 'Velasco Jimenez Veronica', TIPO_DE_BUSQUEDA: 'telefono contacto' },
         { MATRICULA: 221225, NOMBRE_DEL_ALUMNO: 'Velazquez Hernandez Jesus Ignacio', TIPO_DE_BUSQUEDA: 'correo' },
     ];
-    
-    const filteredData = data.filter(item => 
+
+    {/* Automata que hace el metodo de busqueda y valida cada caracter sin librería */}
+
+    function createDFA(searchTerm) {
+        const states = Array.from({ length: searchTerm.length + 1 }, () => ({}));
+        states[0][searchTerm[0]] = 1;
+        for (let i = 1, lps = 0; i <= searchTerm.length; i++) {
+            for (const char of Object.keys(states[0])) {
+                states[i][char] = states[lps][char];
+            }
+            if (i < searchTerm.length) {
+                states[i][searchTerm[i]] = i + 1;
+                if (searchTerm[i] === searchTerm[lps]) {
+                    lps++;
+                }
+            }
+        }
+        return states;
+    }
+
+    function searchWithDFA(dfa, text) {
+        let state = 0;
+        for (const char of text) {
+            state = dfa[state][char] || 0;
+            if (state === dfa.length - 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    useEffect(() => {
+        setDfa(createDFA(searchTerm.toLowerCase()));
+    }, [searchTerm]);
+
+
+    const filteredData = dfa ? data.filter(item =>
+        searchWithDFA(dfa, item.NOMBRE_DEL_ALUMNO.toLowerCase()) ||
+        searchWithDFA(dfa, item.MATRICULA.toString().toLowerCase()) ||
+        searchWithDFA(dfa, item.TIPO_DE_BUSQUEDA.toLowerCase())
+    ) : data;
+
+    {/* Metodo de busqueda y ordenación con métodos de JS */}
+
+    {/*const filteredData = data.filter(item => 
         item.NOMBRE_DEL_ALUMNO.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.MATRICULA.toString().includes(searchTerm)
-    );
+        item.MATRICULA.toString().includes(searchTerm) ||
+        item.TIPO_DE_BUSQUEDA.toLowerCase().includes(searchTerm.toLowerCase())
+    );*/}
     return (
         <>
-         <div className='contenedor'>
-            <div class="group">
-                <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
-                    <g>
-                        <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
-                    </g>
-                </svg>
-                <input 
-                    type="search" 
-                    placeholder="Buscar..." 
-                    value={searchTerm} 
-                    onChange={e => setSearchTerm(e.target.value)} 
-                    className="input"
-                />
-            </div>
-            <table className="data-table">
-                <thead>
-                    <tr>
-                        <th>MATRICULA</th>
-                        <th>NOMBRE DEL ALUMNO</th>
-                        <th>TIPO DE BUSQUEDA</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredData.map(item => (
-                        <tr key={item.MATRICULA}>
-                            <td>{item.MATRICULA}</td>
-                            <td className='nombre-alumno'>{item.NOMBRE_DEL_ALUMNO}</td>
-                            <td className='tipo-busqueda'>{item.TIPO_DE_BUSQUEDA}</td>
+            <div className='contenedor'>
+                <div className="group">
+                    <svg className="icon" aria-hidden="true" viewBox="0 0 24 24">
+                        <g>
+                            <path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path>
+                        </g>
+                    </svg>
+                    <input 
+                        type="search" 
+                        placeholder="Buscar..." 
+                        value={searchTerm} 
+                        onChange={e => setSearchTerm(e.target.value)} 
+                        className="input"
+                    />
+                </div>
+                <table className="data-table">
+                    <thead>
+                        <tr>
+                            <th>MATRICULA</th>
+                            <th>NOMBRE DEL ALUMNO</th>
+                            <th>TIPO DE BUSQUEDA</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {filteredData.map(item => (
+                            <tr key={item.MATRICULA}>
+                                <td>{item.MATRICULA}</td>
+                                <td className='nombre-alumno'>{item.NOMBRE_DEL_ALUMNO}</td>
+                                <td className='tipo-busqueda'>{item.TIPO_DE_BUSQUEDA}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </>
     );
 }
