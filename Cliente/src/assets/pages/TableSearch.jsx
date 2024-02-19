@@ -39,39 +39,38 @@ export default function App() {
 
     {/* Automata que hace el metodo de busqueda y valida cada caracter sin librería */}
 
-    function createDFA(searchTerm) {
-        const states = Array.from({ length: searchTerm.length + 1 }, () => ({}));
-        states[0][searchTerm[0]] = 1;
-        for (let i = 1, lps = 0; i <= searchTerm.length; i++) {
-            for (const char of Object.keys(states[0])) {
+    function createDFA(searchTerm) {   // La función createDFA crea un autómata finito determinista (DFA) para el término de búsqueda
+        const states = Array.from({ length: searchTerm.length + 1 }, () => ({}));   // Crea un array de objetos vacíos, uno para cada estado en el DFA
+        states[0][searchTerm[0]] = 1;   // El primer estado transita al segundo estado en el primer carácter del término de búsqueda
+        for (let i = 1, lps = 0; i <= searchTerm.length; i++) { // Para cada carácter en el término de búsqueda
+            for (const char of Object.keys(states[0])) {    // Copia las transiciones desde el estado del sufijo prefijo más largo (lps)
                 states[i][char] = states[lps][char];
             }
-            if (i < searchTerm.length) {
-                states[i][searchTerm[i]] = i + 1;
-                if (searchTerm[i] === searchTerm[lps]) {
-                    lps++;
+            if (i < searchTerm.length) {    // Si no estamos en el último carácter del término de búsqueda
+                states[i][searchTerm[i]] = i + 1;   // El estado actual transita al siguiente estado en el carácter actual del término de búsqueda
+                if (searchTerm[i] === searchTerm[lps]) {    // Si el carácter actual del término de búsqueda es el mismo que el carácter en el índice lps
+                    lps++;  // Incrementa el índice lps
                 }
             }
         }
-        return states;
+        return states;  // Devuelve el DFA
     }
 
-    function searchWithDFA(dfa, text) {
-        let state = 0;
-        for (const char of text) {
-            state = dfa[state][char] || 0;
-            if (state === dfa.length - 1) {
+    function searchWithDFA(dfa, text) { // La función searchWithDFA usa el DFA para buscar el término de búsqueda en un texto dado
+        let state = 0;  // Comienza en el primer estado del DFA
+        for (const char of text) {  // Para cada carácter en el texto
+            state = dfa[state][char] || 0;  // Transita al siguiente estado basado en el carácter actual, o va al primer estado si no hay transición
+            if (state === dfa.length - 1) { // Si estamos en el último estado del DFA, se ha encontrado el término de búsqueda
                 return true;
             }
         }
-        return false;
+        return false;   // El término de búsqueda no se encontró en el texto
     }
 
-    useEffect(() => {
+    useEffect(() => {   // Cuando el término de búsqueda cambia, crea un nuevo DFA para el término de búsqueda
         setDfa(createDFA(searchTerm.toLowerCase()));
     }, [searchTerm]);
-
-
+    // Filtra los datos basándose en si el término de búsqueda se encuentra en los campos 'NOMBRE_DEL_ALUMNO', 'MATRICULA', o 'TIPO_DE_BUSQUEDA'
     const filteredData = dfa ? data.filter(item =>
         searchWithDFA(dfa, item.NOMBRE_DEL_ALUMNO.toLowerCase()) ||
         searchWithDFA(dfa, item.MATRICULA.toString().toLowerCase()) ||
