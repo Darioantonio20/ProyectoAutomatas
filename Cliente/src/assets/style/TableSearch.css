@@ -71,6 +71,70 @@
 .data-table th:nth-child(4) { display: none; }
 }
 
+/* Existing styles... */
+
+/* Responsive table */
+@media screen and (max-width: 600px) {
+    .data-table {
+        border: 0;
+        width: 100%;
+    }
+
+    .data-table thead {
+        display: none;
+    }
+
+    .data-table tr {
+        margin-bottom: 10px;
+        display: block;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .data-table td {
+        display: block;
+        text-align: right;
+        font-size: 13px;
+        border-bottom: 1px dotted #ccc;
+    }
+
+    .data-table td::before {
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+}
+
+/* Existing styles... */
+
+/* Responsive table */
+@media screen and (max-width: 600px) {
+    .data-table thead {
+        display: none;
+    }
+
+    .data-table tr {
+        margin-bottom: 10px;
+        display: block;
+        border-bottom: 2px solid #ddd;
+    }
+
+    .data-table th, .data-table td {
+        display: block;
+        text-align: right;
+        font-size: 13px;
+        border-bottom: 1px dotted #ccc;
+    }
+
+    .data-table th::before, .data-table td::before {
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+}
+
+
 /* input */
 
 .contenedor {

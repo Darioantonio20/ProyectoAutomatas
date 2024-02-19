@@ -106,14 +106,13 @@ const filteredData = dfa
             className="input"
           />
         </div>
-        <table className="data-table">
+        <table className="data-table" style={{ color: 'white' }}>
           <thead>
             <tr>
               <th>CLAVE CLIENTE</th>
               <th>NOMBRE DE CONTACTO</th>
               <th>CORREO</th>
               <th>TELEFONO CONTACTO</th>
-
             </tr>
           </thead>
           <tbody>
@@ -123,7 +122,6 @@ const filteredData = dfa
                 <td className="nombre-contacto">{item["   Nombre Contacto "]}</td>
                 <td className="correo">{item["Correo "]}</td>
                 <td className="telefono">{item["Teléfono Contacto  "]}</td>
-
               </tr>
             ))}
           </tbody>
