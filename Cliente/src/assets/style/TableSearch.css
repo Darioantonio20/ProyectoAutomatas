@@ -1,6 +1,6 @@
 .data-table th h1 {
     font-weight: bold;
-    font-size: 1em;
+    font-size: auto;
     text-align: center; /* Cambiado de left a center */
     color: #a9b1a8;
 }
@@ -17,7 +17,7 @@
 .data-table {
     text-align: center; /* Cambiado de left a center */
     overflow: hidden;
-    width: 50vw;
+    width: 90vw; /* Modificado de 50vw a 90vw */
     margin: 0 auto;
     display: table;
     padding: 0 0 8em 0;
